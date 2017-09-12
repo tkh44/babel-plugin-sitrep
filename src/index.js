@@ -28,6 +28,17 @@ module.exports = function(babel) {
     visitor: {
       Function(path) {
         if (hasSitcomComment(getComments(path.node))) {
+          path
+            .get('body')
+            .unshiftContainer(
+              'body',
+              t.expressionStatement(
+                createLogStatement(
+                  t.stringLiteral(`function: ${path.node.id.name}`)
+                )
+              )
+            )
+
           path.traverse({
             VariableDeclaration(path) {
               path.node.declarations.forEach(dec => {
