@@ -5,7 +5,7 @@ module.exports = function(babel) {
     return (node && node.leadingComments) || []
   }
 
-  function hasSitcomComment(comments) {
+  function hasSitrepComments(comments) {
     return comments.some(c => c.value.trim() === 'sitrep')
   }
 
@@ -17,46 +17,56 @@ module.exports = function(babel) {
     )
     return t.callExpression(
       callee,
-      thing.name === '__$returnValue'
+      thing.name && thing.name.includes('returnValue')
         ? [t.stringLiteral('Return Value:'), thing]
         : thing.name ? [t.stringLiteral(thing.name), thing] : [thing]
     )
   }
 
+  const dive = {
+    AssignmentExpression(path) {
+      path.insertAfter(
+        t.expressionStatement(createLogStatement(path.node.left))
+      )
+    },
+    VariableDeclaration(path) {
+      const decls = path.node.declarations
+      decls.forEach(dec => {
+        path.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
+      })
+    },
+    ReturnStatement(path) {
+      const id = path.scope.generateUidIdentifier('returnValue')
+      path.insertBefore(
+        t.variableDeclaration('var', [
+          t.variableDeclarator(id, path.node.argument)
+        ])
+      )
+      path.node.argument = id
+    }
+  }
+
   return {
     name: 'babel-plugin-sitrep', // not required
     visitor: {
-      Function(path) {
-        if (hasSitcomComment(getComments(path.node))) {
-          path
-            .get('body')
-            .unshiftContainer(
-              'body',
-              t.expressionStatement(
-                createLogStatement(
-                  t.stringLiteral(`function: ${path.node.id.name}`)
-                )
-              )
-            )
+      BlockStatement(path) {
+        let p = path.findParent(p => hasSitrepComments(getComments(p.node)))
+        if (!p) {
+          return
+        }
 
-          path.traverse({
-            VariableDeclaration(path) {
-              path.node.declarations.forEach(dec => {
-                path.insertAfter(
-                  t.expressionStatement(createLogStatement(dec.id))
-                )
-              })
-            },
-            ReturnStatement(path) {
-              const id = t.identifier('__$returnValue')
-              path.insertBefore(
-                t.variableDeclaration('var', [
-                  t.variableDeclarator(id, path.node.argument)
-                ])
-              )
-              path.node.argument = id
-            }
-          })
+        if (hasSitrepComments(getComments(p.node))) {
+          path.traverse(dive)
+        }
+      },
+      ArrowFunctionExpression(path) {
+        let p = path.findParent(p => hasSitrepComments(getComments(p.node)))
+        if (!p) {
+          return
+        }
+
+        if (hasSitrepComments(getComments(p.node))) {
+          path.arrowFunctionToShadowed()
         }
       }
     }

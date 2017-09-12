@@ -12,9 +12,35 @@ pluginTester({
         function bar () {
           var a = 'foo'
           const b = 'bar'
-          let c = [a, b].map(x => x.charAt(0))
-          console.log('h')
+          let c = [a, b].map(x => x)
           return c.join('-')
+        }
+        
+        var cb = x => x.charAt(0)
+        
+        var cb = x => {
+          x = x + 2
+          x.charAt(0)
+          return x
+        }
+        
+        var a = function () {
+          return 'foo'
+        }
+        
+        const obj = {
+          fn() {
+            let a = 5
+            return a + 5
+          }
+        }
+        
+        class Boom {
+          fire() {
+            let a = 2
+            
+            return a + 5
+          }
         }
       `
     },
@@ -25,9 +51,40 @@ pluginTester({
         function bar () {
           var a = 'foo'
           const b = 'bar'
-          let c = [a, b].map(x => x.charAt(0))
-          console.log('h')
+          let c = [a, b].map(x => x)
           return c.join('-')
+        }
+        
+        // sitrep
+        var cb = x => x.charAt(0)
+        
+        // sitrep
+        var cb = x => {
+          x = x + 2
+          x.charAt(0)
+          return x
+        }
+        
+        // sitrep
+        var a = function () {
+          return 'foo'
+        }
+        
+        const obj = {
+          // sitrep
+          fn() {
+            let a = 5
+            return a + 5
+          }
+        }
+        
+        class Boom {
+          // sitrep
+          fire() {
+            let a = 2
+            
+            return a + 5
+          }
         }
       `
     }
