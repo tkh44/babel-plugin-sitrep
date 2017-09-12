@@ -2,7 +2,7 @@
   "name": "babel-plugin-sitrep",
   "version": "0.0.1",
   "description": "Log all assignments and the return value of a function with a simple comment",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "test"
   },
