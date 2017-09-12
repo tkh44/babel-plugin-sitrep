@@ -59,5 +59,12 @@
   },
   "dependencies": {
     "babel-plugin-tester": "^4.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/tkh44/babel-plugin-sitrep/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tkh44/babel-plugin-sitrep.git"
   }
 }
