@@ -21,6 +21,7 @@ function bar () {
 ```javascript
 // sitrep
 function bar () {
+  console.log("function: bar");
   var a = 'foo'
   console.log("a", a);
   const b = 'bar'
