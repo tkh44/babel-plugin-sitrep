@@ -4,7 +4,8 @@
   "description": "Log all assignments and the return value of a function with a simple comment",
   "main": "src/index.js",
   "scripts": {
-    "test": "test"
+    "test": "jest --coverage --no-cache --ci --runInBand",
+    "test:watch": "jest --watch --no-cache"
   },
   "author": "Kye Hohenberger",
   "license": "MIT",
