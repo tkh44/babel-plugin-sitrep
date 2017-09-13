@@ -2,6 +2,10 @@
 
 > Log all assignments and the return value of a function with a simple comment
 
+[![npm version](https://badge.fury.io/js/babel-plugin-sitrep.svg)](https://badge.fury.io/js/babel-plugin-sitrep)
+[![Build Status](https://travis-ci.org/tkh44/babel-plugin-sitrep.svg?branch=master)](https://travis-ci.org/tkh44/babel-plugin-sitrep)
+[![codecov](https://codecov.io/gh/tkh44/babel-plugin-sitrep/branch/master/graph/badge.svg)](https://codecov.io/gh/tkh44/babel-plugin-sitrep)
+
 ## Example
 
 **In**
