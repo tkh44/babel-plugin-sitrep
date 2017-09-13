@@ -32,5 +32,16 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tkh44/babel-plugin-sitrep.git"
-  }
+  },
+  "keywords": [
+    "console",
+    "console.log",
+    "babel",
+    "plugin",
+    "babel-plugin-sitrep",
+    "babel log",
+    "logging",
+    "logger",
+    "log"
+  ]
 }
