@@ -1,5 +1,10 @@
 module.exports = function(babel) {
   const { types: t } = babel
+  const logCallee = t.memberExpression(
+    t.identifier('console'),
+    t.identifier('log'),
+    false
+  )
 
   function getComments(node) {
     return (node && node.leadingComments) || []
@@ -10,13 +15,8 @@ module.exports = function(babel) {
   }
 
   function createLogStatement(thing) {
-    const callee = t.memberExpression(
-      t.identifier('console'),
-      t.identifier('log'),
-      false
-    )
     return t.callExpression(
-      callee,
+      logCallee,
       thing.name && thing.name.includes('returnValue')
         ? [t.stringLiteral('Return Value:'), thing]
         : thing.name ? [t.stringLiteral(thing.name), thing] : [thing]
@@ -32,6 +32,22 @@ module.exports = function(babel) {
     VariableDeclaration(path) {
       const decls = path.node.declarations
       decls.forEach(dec => {
+        if (t.isPattern(dec.id)) {
+          dec.id.properties.reverse().forEach(prop => {
+            path.insertAfter(
+              t.expressionStatement(
+                t.callExpression(logCallee, [
+                  t.isIdentifier(prop.value)
+                    ? t.stringLiteral(prop.value.name)
+                    : t.stringLiteral(prop.key.name),
+                  t.isIdentifier(prop.value) ? prop.value : prop.key
+                ])
+              )
+            )
+          })
+          return
+        }
+
         path.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
       })
     },
@@ -50,7 +66,7 @@ module.exports = function(babel) {
     name: 'babel-plugin-sitrep', // not required
     visitor: {
       BlockStatement(path) {
-        let p = path.findParent(p => hasSitrepComments(getComments(p.node)))
+        let p = path.getFunctionParent()
         if (!p) {
           return
         }
@@ -59,14 +75,14 @@ module.exports = function(babel) {
           path.traverse(dive)
         }
       },
-      ArrowFunctionExpression(path) {
-        let p = path.findParent(p => hasSitrepComments(getComments(p.node)))
-        if (!p) {
-          return
-        }
-
-        if (hasSitrepComments(getComments(p.node))) {
-          path.arrowFunctionToShadowed()
+      VariableDeclarator(path) {
+        if (hasSitrepComments(getComments(path.parentPath.node))) {
+          if (t.isArrowFunctionExpression(path.node.init)) {
+            path.get('init').arrowFunctionToShadowed()
+          }
+          if (t.isFunction(path.node.init)) {
+            path.traverse(dive)
+          }
         }
       }
     }

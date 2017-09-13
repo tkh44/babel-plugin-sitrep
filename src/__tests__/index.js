@@ -45,7 +45,7 @@ pluginTester({
       `
     },
     {
-      title: 'should add console logs',
+      title: 'function',
       code: `
         // sitrep
         function bar () {
@@ -54,30 +54,50 @@ pluginTester({
           let c = [a, b].map(x => x)
           return c.join('-')
         }
-        
+      `
+    },
+    {
+      title: 'arrow function expression (shorthand arrow fn)',
+      code: `
         // sitrep
         var cb = x => x.charAt(0)
-        
+      `
+    },
+    {
+      title: 'arrow function assignment',
+      code: `
         // sitrep
         var cb = x => {
           x = x + 2
           x.charAt(0)
           return x
         }
-        
+      `
+    },
+    {
+      title: 'function assignment',
+      code: `
         // sitrep
         var a = function () {
           return 'foo'
         }
-        
+      `
+    },
+    {
+      title: 'object properties',
+      code: `
         const obj = {
           // sitrep
           fn() {
-            let a = 5
-            return a + 5
+            const { a, b, c = 'foo', d: alias } = x;
+            return a + b + c + alias;
           }
         }
-        
+      `
+    },
+    {
+      title: 'class methods',
+      code: `
         class Boom {
           // sitrep
           fire() {

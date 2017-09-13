@@ -1,18 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`should add console logs 1`] = `
+exports[`arrow function assignment 1`] = `
 "
-// sitrep
-function bar () {
-  var a = 'foo'
-  const b = 'bar'
-  let c = [a, b].map(x => x)
-  return c.join('-')
-}
-
-// sitrep
-var cb = x => x.charAt(0)
-
 // sitrep
 var cb = x => {
   x = x + 2
@@ -20,19 +9,39 @@ var cb = x => {
   return x
 }
 
+      ↓ ↓ ↓ ↓ ↓ ↓
+
 // sitrep
-var a = function () {
-  return 'foo'
-}
+var cb = function (x) {
+  x = x + 2;
+  console.log(\\"x\\", x);
+  x.charAt(0);
+  var _returnValue = x;
+  console.log(\\"Return Value:\\", _returnValue);
+  return _returnValue;
+};
+"
+`;
 
-const obj = {
-  // sitrep
-  fn() {
-    let a = 5
-    return a + 5
-  }
-}
+exports[`arrow function expression (shorthand arrow fn) 1`] = `
+"
+// sitrep
+var cb = x => x.charAt(0)
 
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+var cb = function (x) {
+  var _returnValue = x.charAt(0);
+
+  console.log(\\"Return Value:\\", _returnValue);
+  return _returnValue;
+};
+"
+`;
+
+exports[`class methods 1`] = `
+"
 class Boom {
   // sitrep
   fire() {
@@ -44,17 +53,41 @@ class Boom {
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
+class Boom {
+  // sitrep
+  fire() {
+    let a = 2;
+
+    console.log(\\"a\\", a);
+
+    var _returnValue = a + 5;
+
+    console.log(\\"Return Value:\\", _returnValue);
+    return _returnValue;
+  }
+}
+"
+`;
+
+exports[`function 1`] = `
+"
+// sitrep
+function bar () {
+  var a = 'foo'
+  const b = 'bar'
+  let c = [a, b].map(x => x)
+  return c.join('-')
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
 // sitrep
 function bar() {
   var a = 'foo';
   console.log('a', a);
   const b = 'bar';
   console.log('b', b);
-  let c = [a, b].map(function (x) {
-    var _returnValue2 = x;
-    console.log('Return Value:', _returnValue2);
-    return _returnValue2;
-  });
+  let c = [a, b].map(x => x);
   console.log('c', c);
 
   var _returnValue = c.join('-');
@@ -62,59 +95,55 @@ function bar() {
   console.log('Return Value:', _returnValue);
   return _returnValue;
 }
+"
+`;
 
+exports[`function assignment 1`] = `
+"
 // sitrep
-var cb = function (x) {
-  var _returnValue3 = x.charAt(0);
+var a = function () {
+  return 'foo'
+}
 
-  console.log('Return Value:', _returnValue3);
-  return _returnValue3;
-};
-
-// sitrep
-var cb = function (x) {
-  x = x + 2;
-  console.log('x', x);
-  x.charAt(0);
-  var _returnValue4 = x;
-  console.log('Return Value:', _returnValue4);
-  return _returnValue4;
-};
+      ↓ ↓ ↓ ↓ ↓ ↓
 
 // sitrep
 var a = function () {
-  var _returnValue5 = 'foo';
-  console.log('Return Value:', _returnValue5);
+  var _returnValue = 'foo';
+  console.log('Return Value:', _returnValue);
 
-  return _returnValue5;
+  return _returnValue;
 };
+"
+`;
+
+exports[`object properties 1`] = `
+"
+const obj = {
+  // sitrep
+  fn() {
+    const { a, b, c = 'foo', d: alias } = x;
+    return a + b + c + alias;
+  }
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
 
 const obj = {
   // sitrep
   fn() {
-    let a = 5;
+    const { d: alias, c = 'foo', b, a } = x;
     console.log('a', a);
+    console.log('b', b);
+    console.log('c', c);
+    console.log('alias', alias);
 
-    var _returnValue6 = a + 5;
+    var _returnValue = a + b + c + alias;
 
-    console.log('Return Value:', _returnValue6);
-    return _returnValue6;
+    console.log('Return Value:', _returnValue);
+    return _returnValue;
   }
 };
-
-class Boom {
-  // sitrep
-  fire() {
-    let a = 2;
-
-    console.log('a', a);
-
-    var _returnValue7 = a + 5;
-
-    console.log('Return Value:', _returnValue7);
-    return _returnValue7;
-  }
-}
 "
 `;
 
