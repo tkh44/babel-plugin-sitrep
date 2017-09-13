@@ -13,11 +13,14 @@ var cb = x => {
 
 // sitrep
 var cb = function (x) {
+  console.groupCollapsed(\\"cb\\");
+
   x = x + 2;
-  console.log(\\"x\\", x);
+  console.log(\\"x: \\", x);
   x.charAt(0);
   var _returnValue = x;
   console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"cb\\");
   return _returnValue;
 };
 "
@@ -32,9 +35,12 @@ var cb = x => x.charAt(0)
 
 // sitrep
 var cb = function (x) {
+  console.groupCollapsed(\\"cb\\");
+
   var _returnValue = x.charAt(0);
 
   console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"cb\\");
   return _returnValue;
 };
 "
@@ -56,13 +62,16 @@ class Boom {
 class Boom {
   // sitrep
   fire() {
+    console.groupCollapsed(\\"fire\\");
+
     let a = 2;
 
-    console.log(\\"a\\", a);
+    console.log(\\"a: \\", a);
 
     var _returnValue = a + 5;
 
     console.log(\\"Return Value:\\", _returnValue);
+    console.groupEnd(\\"fire\\");
     return _returnValue;
   }
 }
@@ -83,16 +92,19 @@ function bar () {
 
 // sitrep
 function bar() {
+  console.groupCollapsed('bar');
+
   var a = 'foo';
-  console.log('a', a);
+  console.log('a: ', a);
   const b = 'bar';
-  console.log('b', b);
+  console.log('b: ', b);
   let c = [a, b].map(x => x);
-  console.log('c', c);
+  console.log('c: ', c);
 
   var _returnValue = c.join('-');
 
   console.log('Return Value:', _returnValue);
+  console.groupEnd('bar');
   return _returnValue;
 }
 "
@@ -109,8 +121,10 @@ var a = function () {
 
 // sitrep
 var a = function () {
+  console.groupCollapsed('a');
   var _returnValue = 'foo';
   console.log('Return Value:', _returnValue);
+  console.groupEnd('a');
 
   return _returnValue;
 };
@@ -152,6 +166,8 @@ const obj = {
 const obj = {
   // sitrep
   fn() {
+    console.groupCollapsed('fn');
+
     const { a, b, c = 'foo', d: alias } = x;
     console.log('a', a);
     console.log('b', b);
@@ -161,6 +177,7 @@ const obj = {
     var _returnValue = a + b + c + alias;
 
     console.log('Return Value:', _returnValue);
+    console.groupEnd('fn');
     return _returnValue;
   }
 };
