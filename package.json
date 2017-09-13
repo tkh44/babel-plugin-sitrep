@@ -4,62 +4,27 @@
   "description": "Log all assignments and the return value of a function with a simple comment",
   "main": "src/index.js",
   "scripts": {
+    "lint": "standard src",
+    "lint:fix": "standard --fix src",
     "test": "jest --coverage --no-cache --ci --runInBand",
     "test:watch": "jest --watch --no-cache"
   },
   "author": "Kye Hohenberger",
   "license": "MIT",
   "eslintConfig": {
-    "extends": [
-      "standard"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "parser": "babel-eslint",
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "singleQuote": true,
-          "semi": false
-        }
-      ],
-      "react/prop-types": 0,
-      "react/no-unused-prop-types": 0,
-      "standard/computed-property-even-spacing": 0,
-      "no-template-curly-in-string": 0
-    },
-    "overrides": [
-      {
-        "files": [
-          "*.test.js"
-        ],
-        "env": {
-          "jest": true
-        }
-      }
-    ]
+    "extends": "standard",
+    "parser": "babel-eslint"
+  },
+  "standard": {
+    "parser": "babel-eslint"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.5.0",
-    "eslint-config-prettier": "^2.3.0",
-    "eslint-config-react": "^1.1.7",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-config-standard-react": "^5.0.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.1.1",
-    "eslint-plugin-prettier": "^2.2.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-react": "^7.3.0",
-    "eslint-plugin-standard": "^3.0.1",
+    "babel-plugin-tester": "^4.0.0",
     "jest": "^20.0.4",
     "jest-cli": "^20.0.4",
-    "prettier": "^1.6.1"
-  },
-  "dependencies": {
-    "babel-plugin-tester": "^4.0.0"
+    "prettier": "^1.6.1",
+    "standard": "^10.0.3"
   },
   "bugs": {
     "url": "https://github.com/tkh44/babel-plugin-sitrep/issues"

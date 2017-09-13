@@ -107,6 +107,17 @@ pluginTester({
           }
         }
       `
+    },
+    {
+      title: 'no function parent',
+      code: `
+        // sitrep
+        if (a) {
+          let a = 2
+          
+          let b = a + 5
+        }
+      `
     }
   ]
 })

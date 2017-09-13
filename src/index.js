@@ -1,4 +1,4 @@
-module.exports = function(babel) {
+module.exports = function (babel) {
   const { types: t } = babel
   const logCallee = t.memberExpression(
     t.identifier('console'),
@@ -6,15 +6,15 @@ module.exports = function(babel) {
     false
   )
 
-  function getComments(node) {
+  function getComments (node) {
     return (node && node.leadingComments) || []
   }
 
-  function hasSitrepComments(comments) {
+  function hasSitrepComments (comments) {
     return comments.some(c => c.value.trim() === 'sitrep')
   }
 
-  function createLogStatement(thing) {
+  function createLogStatement (thing) {
     return t.callExpression(
       logCallee,
       thing.name && thing.name.includes('returnValue')
@@ -24,34 +24,37 @@ module.exports = function(babel) {
   }
 
   const dive = {
-    AssignmentExpression(path) {
+    AssignmentExpression (path) {
       path.insertAfter(
         t.expressionStatement(createLogStatement(path.node.left))
       )
     },
-    VariableDeclaration(path) {
+    VariableDeclaration (path) {
       const decls = path.node.declarations
       decls.forEach(dec => {
         if (t.isPattern(dec.id)) {
-          dec.id.properties.reverse().forEach(prop => {
-            path.insertAfter(
-              t.expressionStatement(
-                t.callExpression(logCallee, [
-                  t.isIdentifier(prop.value)
-                    ? t.stringLiteral(prop.value.name)
-                    : t.stringLiteral(prop.key.name),
-                  t.isIdentifier(prop.value) ? prop.value : prop.key
-                ])
+          dec.id.properties
+            .slice()
+            .reverse()
+            .forEach(prop => {
+              path.insertAfter(
+                t.expressionStatement(
+                  t.callExpression(logCallee, [
+                    t.isIdentifier(prop.value)
+                      ? t.stringLiteral(prop.value.name)
+                      : t.stringLiteral(prop.key.name),
+                    t.isIdentifier(prop.value) ? prop.value : prop.key
+                  ])
+                )
               )
-            )
-          })
+            })
           return
         }
 
         path.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
       })
     },
-    ReturnStatement(path) {
+    ReturnStatement (path) {
       const id = path.scope.generateUidIdentifier('returnValue')
       path.insertBefore(
         t.variableDeclaration('var', [
@@ -63,19 +66,18 @@ module.exports = function(babel) {
   }
 
   return {
-    name: 'babel-plugin-sitrep', // not required
+    name: 'babel-plugin-sitrep',
     visitor: {
-      BlockStatement(path) {
-        let p = path.getFunctionParent()
-        if (!p) {
-          return
-        }
-
-        if (hasSitrepComments(getComments(p.node))) {
-          path.traverse(dive)
+      Function (path) {
+        if (hasSitrepComments(getComments(path.node))) {
+          path.traverse({
+            BlockStatement (blockStatementPath) {
+              blockStatementPath.traverse(dive)
+            }
+          })
         }
       },
-      VariableDeclarator(path) {
+      VariableDeclarator (path) {
         if (hasSitrepComments(getComments(path.parentPath.node))) {
           if (t.isArrowFunctionExpression(path.node.init)) {
             path.get('init').arrowFunctionToShadowed()

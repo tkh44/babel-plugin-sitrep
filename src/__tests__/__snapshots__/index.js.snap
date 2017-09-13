@@ -117,6 +117,26 @@ var a = function () {
 "
 `;
 
+exports[`no function parent 1`] = `
+"
+// sitrep
+if (a) {
+  let a = 2
+  
+  let b = a + 5
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+if (a) {
+  let a = 2;
+
+  let b = a + 5;
+}
+"
+`;
+
 exports[`object properties 1`] = `
 "
 const obj = {
@@ -132,7 +152,7 @@ const obj = {
 const obj = {
   // sitrep
   fn() {
-    const { d: alias, c = 'foo', b, a } = x;
+    const { a, b, c = 'foo', d: alias } = x;
     console.log('a', a);
     console.log('b', b);
     console.log('c', c);
