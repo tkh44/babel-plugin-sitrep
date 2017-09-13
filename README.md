@@ -55,16 +55,11 @@ class Boom {
 ```javascript
 // sitrep
 function bar () {
-  console.log("function: bar ") ;
   var a = 'foo';
   console.log('a', a);
   const b = 'bar';
   console.log('b', b);
-  let c = [a, b].map(function (x) {
-    var _returnValue2 = x;
-    console.log('Return Value:', _returnValue2);
-    return _returnValue2;
-  });
+  let c = [a, b].map(x => x);
   console.log('c', c);
   var _returnValue = c.join('-');
   console.log('Return Value:', _returnValue);
