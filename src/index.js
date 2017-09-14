@@ -24,13 +24,19 @@ module.exports = function (babel) {
   function createLogStatement (thing) {
     return t.callExpression(
       logCallee,
-      thing.name && thing.name.includes('returnValue')
+      thing.name && thing.name.indexOf('returnValue') > -1
         ? [t.stringLiteral('Return Value:'), thing]
         : thing.name ? [t.stringLiteral(`${thing.name}: `), thing] : [thing]
     )
   }
 
   function getName (path) {
+    if (path.parentPath.isClassProperty()) {
+      if (path.parentPath.node.key && t.isIdentifier(path.parentPath.node.key)) {
+        return path.parentPath.node.key.name
+      }
+    }
+
     if (path.node.id && path.node.id.name) {
       return path.node.id.name
     }
@@ -48,10 +54,6 @@ module.exports = function (babel) {
   }
 
   function functionVisitor (functionPath, state) {
-    if (functionPath.isArrowFunctionExpression()) {
-      return
-    }
-
     let name = getName(functionPath)
     functionPath
       .get('body')
@@ -96,7 +98,9 @@ module.exports = function (babel) {
             return
           }
 
-          variableDeclPath.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
+          variableDeclPath.insertAfter(
+            t.expressionStatement(createLogStatement(dec.id))
+          )
         })
       },
       ReturnStatement (returnPath) {
@@ -135,6 +139,19 @@ module.exports = function (babel) {
   return {
     name: 'babel-plugin-sitrep',
     visitor: {
+      Class (path, state) {
+        path.traverse({
+          ClassProperty (path) {
+            if (hasSitrepComments(getComments(path.node), state.opts.label)) {
+              path.traverse({
+                Function (path) {
+                  functionVisitor(path, state)
+                }
+              })
+            }
+          }
+        })
+      },
       Function (path, state) {
         if (hasSitrepComments(getComments(path.node), state.opts.label)) {
           if (path.isArrowFunctionExpression()) {

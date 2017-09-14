@@ -194,6 +194,23 @@ pluginTester({
             }
         }
       `
+    },
+    {
+      title: 'class property',
+      code: `
+        class Foo {
+          // sitrep
+          handleClick = (e) =>{
+            const foo = e.target.innerText;
+            // some actions based on foo
+            e.preventDefault()
+          }
+        }
+      `,
+      babelOptions: {
+        babelrc: true,
+        filename: __filename
+      }
     }
   ]
 })

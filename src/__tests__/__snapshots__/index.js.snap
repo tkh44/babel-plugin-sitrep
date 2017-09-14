@@ -99,6 +99,38 @@ class Boom {
 "
 `;
 
+exports[`class property 1`] = `
+"
+class Foo {
+  // sitrep
+  handleClick = (e) =>{
+    const foo = e.target.innerText;
+    // some actions based on foo
+    e.preventDefault()
+  }
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+class Foo {
+  constructor() {
+    this.handleClick = e => {
+      console.groupCollapsed(\\"handleClick\\");
+
+      const foo = e.target.innerText;
+      // some actions based on foo
+      console.log(\\"foo: \\", foo);
+      e.preventDefault();
+      console.groupEnd(\\"handleClick\\");
+    };
+  }
+  // sitrep
+
+
+}
+"
+`;
+
 exports[`collapsed option 1`] = `
 "
 // sitrep
