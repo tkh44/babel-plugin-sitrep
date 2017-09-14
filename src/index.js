@@ -47,13 +47,13 @@ module.exports = function (babel) {
     return `function: ${path.getSource().split('\n')[0]}`
   }
 
-  function functionVisitor (path, state) {
-    if (path.isArrowFunctionExpression()) {
+  function functionVisitor (functionPath, state) {
+    if (functionPath.isArrowFunctionExpression()) {
       return
     }
 
-    let name = getName(path)
-    path
+    let name = getName(functionPath)
+    functionPath
       .get('body')
       .unshiftContainer(
         'body',
@@ -64,21 +64,25 @@ module.exports = function (babel) {
         )
       )
     let didWriteGroupEnd = false
-    path.traverse({
+    functionPath.traverse({
       AssignmentExpression (path) {
         path.insertAfter(
           t.expressionStatement(createLogStatement(path.node.left))
         )
       },
-      VariableDeclaration (path) {
-        const decls = path.node.declarations
+      VariableDeclaration (variableDeclPath) {
+        if (!variableDeclPath.parentPath.isBlockStatement()) {
+          return
+        }
+
+        const decls = variableDeclPath.node.declarations
         decls.forEach(dec => {
           if (t.isPattern(dec.id)) {
             dec.id.properties
               .slice()
               .reverse()
               .forEach(prop => {
-                path.insertAfter(
+                variableDeclPath.insertAfter(
                   t.expressionStatement(
                     t.callExpression(logCallee, [
                       t.isIdentifier(prop.value)
@@ -92,18 +96,18 @@ module.exports = function (babel) {
             return
           }
 
-          path.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
+          variableDeclPath.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
         })
       },
-      ReturnStatement (path) {
-        const id = path.scope.generateUidIdentifier('returnValue')
-        path.insertBefore(
+      ReturnStatement (returnPath) {
+        const id = returnPath.scope.generateUidIdentifier('returnValue')
+        returnPath.insertBefore(
           t.variableDeclaration('var', [
-            t.variableDeclarator(id, path.node.argument)
+            t.variableDeclarator(id, returnPath.node.argument)
           ])
         )
 
-        path.insertBefore(
+        returnPath.insertBefore(
           t.expressionStatement(
             t.callExpression(createGroupCallee(true, state.opts.collapsed), [
               t.stringLiteral(name)
@@ -111,11 +115,11 @@ module.exports = function (babel) {
           )
         )
         didWriteGroupEnd = true
-        path.node.argument = id
+        returnPath.node.argument = id
       }
     })
     if (!didWriteGroupEnd) {
-      path
+      functionPath
         .get('body')
         .pushContainer(
           'body',

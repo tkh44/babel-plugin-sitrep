@@ -169,6 +169,31 @@ pluginTester({
       pluginOptions: {
         label: '🔬'
       }
+    },
+    {
+      title: 'function has a for loop',
+      code: `
+        // sitrep
+        function test() {
+            var sum = 0;
+            for (var i = 0; i < 5; i++) {
+                sum = sum + i;
+            }
+            return sum;
+        }
+      `
+    },
+    {
+      title: 'function has a for-of loop',
+      code: `
+        // sitrep
+        function test(arr) {
+            var sum = 0;
+            for (const value of arr) {
+                sum += value;
+            }
+        }
+      `
     }
   ]
 })

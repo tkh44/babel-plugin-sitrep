@@ -239,6 +239,64 @@ function (err, vars) {
 "
 `;
 
+exports[`function has a for loop 1`] = `
+"
+// sitrep
+function test() {
+    var sum = 0;
+    for (var i = 0; i < 5; i++) {
+        sum = sum + i;
+    }
+    return sum;
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+function test() {
+    console.groupCollapsed(\\"test\\");
+
+    var sum = 0;
+    console.log(\\"sum: \\", sum);
+    for (var i = 0; i < 5; i++) {
+        sum = sum + i;
+        console.log(\\"sum: \\", sum);
+    }
+    var _returnValue = sum;
+    console.log(\\"Return Value:\\", _returnValue);
+    console.groupEnd(\\"test\\");
+    return _returnValue;
+}
+"
+`;
+
+exports[`function has a for-of loop 1`] = `
+"
+// sitrep
+function test(arr) {
+    var sum = 0;
+    for (const value of arr) {
+        sum += value;
+    }
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+function test(arr) {
+    console.groupCollapsed(\\"test\\");
+
+    var sum = 0;
+    console.log(\\"sum: \\", sum);
+    for (const value of arr) {
+        sum += value;
+        console.log(\\"sum: \\", sum);
+    }
+    console.groupEnd(\\"test\\");
+}
+"
+`;
+
 exports[`no function parent 1`] = `
 "
 // sitrep
