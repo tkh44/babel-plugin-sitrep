@@ -118,6 +118,31 @@ pluginTester({
           let b = a + 5
         }
       `
+    },
+    {
+      title: 'arrow fn expression callback',
+      code: `
+        myFn(
+          // sitrep
+          (x) => x
+        )
+      `
+    },
+    {
+      title: 'function declaration with multiple returns',
+      code: `
+        myFn(
+          // sitrep
+          function(err, vars) {
+            if (err) {
+              return err
+            }
+            
+            vars = vars.map(x => x)
+            return vars
+          }
+        )
+      `
     }
   ]
 })

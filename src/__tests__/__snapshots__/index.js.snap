@@ -1,5 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`arrow fn expression callback 1`] = `
+"
+myFn(
+  // sitrep
+  (x) => x
+)
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+myFn(
+// sitrep
+function (x) {
+  console.groupCollapsed(\\"function: (x) => x\\");
+  var _returnValue = x;
+  console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"function: (x) => x\\");
+  return _returnValue;
+});
+"
+`;
+
 exports[`arrow function assignment 1`] = `
 "
 // sitrep
@@ -128,6 +149,45 @@ var a = function () {
 
   return _returnValue;
 };
+"
+`;
+
+exports[`function declaration with multiple returns 1`] = `
+"
+myFn(
+  // sitrep
+  function(err, vars) {
+    if (err) {
+      return err
+    }
+    
+    vars = vars.map(x => x)
+    return vars
+  }
+)
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+myFn(
+// sitrep
+function (err, vars) {
+  console.groupCollapsed(\\"function: function(err, vars) {\\");
+
+  if (err) {
+    var _returnValue = err;
+    console.log(\\"Return Value:\\", _returnValue);
+    console.groupEnd(\\"function: function(err, vars) {\\");
+
+    return _returnValue;
+  }
+
+  vars = vars.map(x => x);
+  console.log(\\"vars: \\", vars);
+  var _returnValue2 = vars;
+  console.log(\\"Return Value:\\", _returnValue2);
+  console.groupEnd(\\"function: function(err, vars) {\\");
+  return _returnValue2;
+});
 "
 `;
 

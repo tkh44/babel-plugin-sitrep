@@ -31,27 +31,27 @@ module.exports = function (babel) {
   }
 
   function getName (path) {
-    if (path.isFunction() && path.node.id && path.node.id.name) {
+    if (path.node.id && path.node.id.name) {
       return path.node.id.name
     }
 
-    if (path.isFunction() && path.node.key && t.isIdentifier(path.node.key)) {
+    if (path.node.key && t.isIdentifier(path.node.key)) {
       return path.node.key.name
     }
 
-    const parent = path.findParent(p => p.isVariableDeclarator())
-    if (parent && t.isIdentifier(parent.node.id)) {
-      return parent.node.id.name
+    const variableParent = path.findParent(p => p.isVariableDeclarator())
+    if (variableParent && t.isIdentifier(variableParent.node.id)) {
+      return variableParent.node.id.name
     }
 
-    if (path.node.id) {
-      return path.node.id.name
-    }
-
-    return 'Function'
+    return `function: ${path.getSource().split('\n')[0]}`
   }
 
   function functionVisitor (path) {
+    if (path.isArrowFunctionExpression()) {
+      return
+    }
+
     let name = getName(path)
     path
       .get('body')
@@ -63,59 +63,55 @@ module.exports = function (babel) {
       )
     let didWriteGroupEnd = false
     path.traverse({
-      BlockStatement (blockStatementPath) {
-        blockStatementPath.traverse({
-          AssignmentExpression (path) {
-            path.insertAfter(
-              t.expressionStatement(createLogStatement(path.node.left))
-            )
-          },
-          VariableDeclaration (path) {
-            const decls = path.node.declarations
-            decls.forEach(dec => {
-              if (t.isPattern(dec.id)) {
-                dec.id.properties
-                  .slice()
-                  .reverse()
-                  .forEach(prop => {
-                    path.insertAfter(
-                      t.expressionStatement(
-                        t.callExpression(logCallee, [
-                          t.isIdentifier(prop.value)
-                            ? t.stringLiteral(prop.value.name)
-                            : t.stringLiteral(prop.key.name),
-                          t.isIdentifier(prop.value) ? prop.value : prop.key
-                        ])
-                      )
-                    )
-                  })
-                return
-              }
-
-              path.insertAfter(
-                t.expressionStatement(createLogStatement(dec.id))
-              )
-            })
-          },
-          ReturnStatement (path) {
-            const id = path.scope.generateUidIdentifier('returnValue')
-            path.insertBefore(
-              t.variableDeclaration('var', [
-                t.variableDeclarator(id, path.node.argument)
-              ])
-            )
-
-            path.insertBefore(
-              t.expressionStatement(
-                t.callExpression(createGroupCallee(true), [
-                  t.stringLiteral(name)
-                ])
-              )
-            )
-            didWriteGroupEnd = true
-            path.node.argument = id
+      AssignmentExpression (path) {
+        path.insertAfter(
+          t.expressionStatement(createLogStatement(path.node.left))
+        )
+      },
+      VariableDeclaration (path) {
+        const decls = path.node.declarations
+        decls.forEach(dec => {
+          if (t.isPattern(dec.id)) {
+            dec.id.properties
+              .slice()
+              .reverse()
+              .forEach(prop => {
+                path.insertAfter(
+                  t.expressionStatement(
+                    t.callExpression(logCallee, [
+                      t.isIdentifier(prop.value)
+                        ? t.stringLiteral(prop.value.name)
+                        : t.stringLiteral(prop.key.name),
+                      t.isIdentifier(prop.value) ? prop.value : prop.key
+                    ])
+                  )
+                )
+              })
+            return
           }
+
+          path.insertAfter(
+            t.expressionStatement(createLogStatement(dec.id))
+          )
         })
+      },
+      ReturnStatement (path) {
+        const id = path.scope.generateUidIdentifier('returnValue')
+        path.insertBefore(
+          t.variableDeclaration('var', [
+            t.variableDeclarator(id, path.node.argument)
+          ])
+        )
+
+        path.insertBefore(
+          t.expressionStatement(
+            t.callExpression(createGroupCallee(true), [
+              t.stringLiteral(name)
+            ])
+          )
+        )
+        didWriteGroupEnd = true
+        path.node.argument = id
       }
     })
     if (!didWriteGroupEnd) {
@@ -135,6 +131,9 @@ module.exports = function (babel) {
     visitor: {
       Function (path) {
         if (hasSitrepComments(getComments(path.node))) {
+          if (path.isArrowFunctionExpression()) {
+            path.arrowFunctionToShadowed()
+          }
           functionVisitor(path)
         }
       },
