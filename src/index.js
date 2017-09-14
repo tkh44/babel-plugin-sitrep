@@ -6,10 +6,10 @@ module.exports = function (babel) {
     false
   )
 
-  const createGroupCallee = end =>
+  const createGroupCallee = (end, collapsed = true) =>
     t.memberExpression(
       t.identifier('console'),
-      t.identifier(`group${end ? 'End' : 'Collapsed'}`),
+      t.identifier(`group${end ? 'End' : collapsed ? 'Collapsed' : ''}`),
       false
     )
 
@@ -17,8 +17,8 @@ module.exports = function (babel) {
     return (node && node.leadingComments) || []
   }
 
-  function hasSitrepComments (comments) {
-    return comments.some(c => c.value.trim() === 'sitrep')
+  function hasSitrepComments (comments, label = 'sitrep') {
+    return comments.some(c => c.value.trim() === label)
   }
 
   function createLogStatement (thing) {
@@ -47,7 +47,7 @@ module.exports = function (babel) {
     return `function: ${path.getSource().split('\n')[0]}`
   }
 
-  function functionVisitor (path) {
+  function functionVisitor (path, state) {
     if (path.isArrowFunctionExpression()) {
       return
     }
@@ -58,7 +58,9 @@ module.exports = function (babel) {
       .unshiftContainer(
         'body',
         t.expressionStatement(
-          t.callExpression(createGroupCallee(false), [t.stringLiteral(name)])
+          t.callExpression(createGroupCallee(false, state.opts.collapsed), [
+            t.stringLiteral(name)
+          ])
         )
       )
     let didWriteGroupEnd = false
@@ -90,9 +92,7 @@ module.exports = function (babel) {
             return
           }
 
-          path.insertAfter(
-            t.expressionStatement(createLogStatement(dec.id))
-          )
+          path.insertAfter(t.expressionStatement(createLogStatement(dec.id)))
         })
       },
       ReturnStatement (path) {
@@ -105,7 +105,7 @@ module.exports = function (babel) {
 
         path.insertBefore(
           t.expressionStatement(
-            t.callExpression(createGroupCallee(true), [
+            t.callExpression(createGroupCallee(true, state.opts.collapsed), [
               t.stringLiteral(name)
             ])
           )
@@ -120,7 +120,9 @@ module.exports = function (babel) {
         .pushContainer(
           'body',
           t.expressionStatement(
-            t.callExpression(createGroupCallee(true), [t.stringLiteral(name)])
+            t.callExpression(createGroupCallee(true, state.opts.collapsed), [
+              t.stringLiteral(name)
+            ])
           )
         )
     }
@@ -129,21 +131,27 @@ module.exports = function (babel) {
   return {
     name: 'babel-plugin-sitrep',
     visitor: {
-      Function (path) {
-        if (hasSitrepComments(getComments(path.node))) {
+      Function (path, state) {
+        if (hasSitrepComments(getComments(path.node), state.opts.label)) {
           if (path.isArrowFunctionExpression()) {
             path.arrowFunctionToShadowed()
           }
-          functionVisitor(path)
+          functionVisitor(path, state)
         }
       },
-      VariableDeclarator (path) {
-        if (hasSitrepComments(getComments(path.parentPath.node))) {
+      VariableDeclarator (path, state) {
+        if (
+          hasSitrepComments(getComments(path.parentPath.node), state.opts.label)
+        ) {
           if (t.isArrowFunctionExpression(path.node.init)) {
             path.get('init').arrowFunctionToShadowed()
           }
           if (t.isFunction(path.node.init)) {
-            path.traverse({ Function: functionVisitor })
+            path.traverse({
+              Function (path) {
+                functionVisitor(path, state)
+              }
+            })
           }
         }
       }

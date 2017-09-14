@@ -143,6 +143,32 @@ pluginTester({
           }
         )
       `
+    },
+    {
+      title: 'collapsed option',
+      code: `
+        // sitrep
+        function fn(a) {          
+          a = a.map(x => x)
+          return a
+        }
+      `,
+      pluginOptions: {
+        collapsed: false
+      }
+    },
+    {
+      title: 'custom label',
+      code: `
+        // 🔬
+        function fn(a) {          
+          a = a.map(x => x)
+          return a
+        }
+      `,
+      pluginOptions: {
+        label: '🔬'
+      }
     }
   ]
 })

@@ -158,3 +158,49 @@ require("babel-core").transform("code", {
 });
 ```
 
+
+## Options
+
+### `label`
+
+`string`, defaults to `sitrep`.
+
+This option changes the label that enables the plugin
+
+**Example**
+
+If we set `label` to `"log-all-the-things"`
+
+**In**
+```javascript
+// log-all-the-things
+function fn(a) {          
+  a = a.map(x => x)
+  return a
+}
+```
+
+```↓ ↓ ↓ ↓ ↓ ↓```
+
+**Out**
+```javascript
+// log-all-the-things
+function fn(a) {
+  console.groupCollapsed("fn");
+
+  a = a.map(x => x);
+  console.log("a: ", a);
+  var _returnValue = a;
+  console.log("Return Value:", _returnValue);
+  console.groupEnd("fn");
+  return _returnValue;
+}
+```
+
+### `collapsed`
+
+`boolean`, defaults to `true`.
+
+This option enables the following:
+
+ - Collapse the group of console logs associated with a function

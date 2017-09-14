@@ -99,6 +99,54 @@ class Boom {
 "
 `;
 
+exports[`collapsed option 1`] = `
+"
+// sitrep
+function fn(a) {          
+  a = a.map(x => x)
+  return a
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+function fn(a) {
+  console.group(\\"fn\\");
+
+  a = a.map(x => x);
+  console.log(\\"a: \\", a);
+  var _returnValue = a;
+  console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"fn\\");
+  return _returnValue;
+}
+"
+`;
+
+exports[`custom label 1`] = `
+"
+// 🔬
+function fn(a) {          
+  a = a.map(x => x)
+  return a
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// 🔬
+function fn(a) {
+  console.groupCollapsed(\\"fn\\");
+
+  a = a.map(x => x);
+  console.log(\\"a: \\", a);
+  var _returnValue = a;
+  console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"fn\\");
+  return _returnValue;
+}
+"
+`;
+
 exports[`function 1`] = `
 "
 // sitrep
