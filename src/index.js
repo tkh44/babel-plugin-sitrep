@@ -32,7 +32,10 @@ module.exports = function (babel) {
 
   function getName (path) {
     if (path.parentPath.isClassProperty()) {
-      if (path.parentPath.node.key && t.isIdentifier(path.parentPath.node.key)) {
+      if (
+        path.parentPath.node.key &&
+        t.isIdentifier(path.parentPath.node.key)
+      ) {
         return path.parentPath.node.key.name
       }
     }
@@ -66,11 +69,52 @@ module.exports = function (babel) {
         )
       )
     let didWriteGroupEnd = false
+
     functionPath.traverse({
       AssignmentExpression (path) {
+        if (t.isPattern(path.node.left)) {
+          return
+        }
         path.insertAfter(
           t.expressionStatement(createLogStatement(path.node.left))
         )
+      },
+      ArrayPattern (arrPatternPath) {
+        arrPatternPath.node.elements
+          .slice()
+          .reverse()
+          .forEach(element => {
+            let id = element
+            if (t.isAssignmentPattern(element)) {
+              id = element.left
+            }
+            arrPatternPath
+              .getStatementParent()
+              .insertAfter(
+                t.expressionStatement(
+                  t.callExpression(logCallee, [t.stringLiteral(id.name), id])
+                )
+              )
+          })
+      },
+      ObjectPattern (objPatternPath) {
+        objPatternPath.node.properties
+          .slice()
+          .reverse()
+          .forEach(prop => {
+            objPatternPath
+              .getStatementParent()
+              .insertAfter(
+                t.expressionStatement(
+                  t.callExpression(logCallee, [
+                    t.isIdentifier(prop.value)
+                      ? t.stringLiteral(prop.value.name)
+                      : t.stringLiteral(prop.key.name),
+                    t.isIdentifier(prop.value) ? prop.value : prop.key
+                  ])
+                )
+              )
+          })
       },
       VariableDeclaration (variableDeclPath) {
         if (!variableDeclPath.parentPath.isBlockStatement()) {
@@ -79,22 +123,11 @@ module.exports = function (babel) {
 
         const decls = variableDeclPath.node.declarations
         decls.forEach(dec => {
+          if (!dec.init) {
+            return
+          }
+
           if (t.isPattern(dec.id)) {
-            dec.id.properties
-              .slice()
-              .reverse()
-              .forEach(prop => {
-                variableDeclPath.insertAfter(
-                  t.expressionStatement(
-                    t.callExpression(logCallee, [
-                      t.isIdentifier(prop.value)
-                        ? t.stringLiteral(prop.value.name)
-                        : t.stringLiteral(prop.key.name),
-                      t.isIdentifier(prop.value) ? prop.value : prop.key
-                    ])
-                  )
-                )
-              })
             return
           }
 

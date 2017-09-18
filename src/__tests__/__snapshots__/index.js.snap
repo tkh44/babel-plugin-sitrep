@@ -1,5 +1,65 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`array properties 1`] = `
+"
+// sitrep
+function fn() {
+  const [a, b = 'foo', c, d] = x.split(\\"_\\");
+  return a + b + c + d;
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+function fn() {
+  console.groupCollapsed(\\"fn\\");
+
+  const [a, b = 'foo', c, d] = x.split(\\"_\\");
+  console.log(\\"a\\", a);
+  console.log(\\"b\\", b);
+  console.log(\\"c\\", c);
+  console.log(\\"d\\", d);
+
+  var _returnValue = a + b + c + d;
+
+  console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"fn\\");
+  return _returnValue;
+}
+"
+`;
+
+exports[`array properties with let 1`] = `
+"
+// sitrep
+function fn() {
+  let a, b, c, d;
+  [a, b = 'foo', c, d] = x.split(\\"_\\");
+  return a + b + c + d;
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+function fn() {
+  console.groupCollapsed(\\"fn\\");
+
+  let a, b, c, d;
+  [a, b = 'foo', c, d] = x.split(\\"_\\");
+  console.log(\\"a\\", a);
+  console.log(\\"b\\", b);
+  console.log(\\"c\\", c);
+  console.log(\\"d\\", d);
+
+  var _returnValue = a + b + c + d;
+
+  console.log(\\"Return Value:\\", _returnValue);
+  console.groupEnd(\\"fn\\");
+  return _returnValue;
+}
+"
+`;
+
 exports[`arrow fn expression callback 1`] = `
 "
 myFn(
@@ -186,6 +246,7 @@ function bar () {
   var a = 'foo'
   const b = 'bar'
   let c = [a, b].map(x => x)
+  let d = a
   return c.join('-')
 }
 
@@ -201,6 +262,8 @@ function bar() {
   console.log('b: ', b);
   let c = [a, b].map(x => x);
   console.log('c: ', c);
+  let d = a;
+  console.log('d: ', d);
 
   var _returnValue = c.join('-');
 
@@ -382,8 +445,46 @@ const obj = {
 "
 `;
 
+exports[`object properties with let 1`] = `
+"
+const obj = {
+  // sitrep
+  fn(x) {
+    let a, b, c, d;
+    ({ a, b, c = 'foo', d: alias } = x);
+    return a + b + c + alias;
+  }
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+const obj = {
+  // sitrep
+  fn(x) {
+    console.groupCollapsed('fn');
+
+    let a, b, c, d;
+    ({ a, b, c = 'foo', d: alias } = x);
+    console.log('a', a);
+    console.log('b', b);
+    console.log('c', c);
+    console.log('alias', alias);
+
+    var _returnValue = a + b + c + alias;
+
+    console.log('Return Value:', _returnValue);
+    console.groupEnd('fn');
+    return _returnValue;
+  }
+};
+"
+`;
+
 exports[`should not add console logs 1`] = `
 "
+// sitrep
+const shouldNotLog = 'bar';
+
 function bar () {
   var a = 'foo'
   const b = 'bar'
@@ -411,14 +512,22 @@ const obj = {
 }
 
 class Boom {
+  // sitrep
+  shouldNotLog = 'bar';
+
   fire() {
     let a = 2
     
     return a + 5
   }
+  
+  handleClick = (e) => e.preventDefault()
 }
 
       ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep
+const shouldNotLog = 'bar';
 
 function bar() {
   var a = 'foo';
@@ -447,11 +556,20 @@ const obj = {
 };
 
 class Boom {
+  constructor() {
+    this.shouldNotLog = 'bar';
+
+    this.handleClick = e => e.preventDefault();
+  }
+  // sitrep
+
+
   fire() {
     let a = 2;
 
     return a + 5;
   }
+
 }
 "
 `;
