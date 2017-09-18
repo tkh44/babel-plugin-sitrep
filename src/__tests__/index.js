@@ -101,7 +101,7 @@ pluginTester({
         // sitrep
         fn() {
           const [a, b, c, d] = x.split("_");
-          return a + b + c + alias;
+          return a + b + c + d;
         }
       `
     },
