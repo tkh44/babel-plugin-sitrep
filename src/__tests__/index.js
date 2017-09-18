@@ -96,6 +96,16 @@ pluginTester({
       `
     },
     {
+      title: 'array properties',
+      code: `
+        // sitrep
+        fn() {
+          const [a, b, c, d] = x.split("_");
+          return a + b + c + d;
+        }
+      `
+    },
+    {
       title: 'class methods',
       code: `
         class Boom {
