@@ -133,7 +133,7 @@ class Boom {
   // sitrep
   fire() {
     let a = 2
-    
+
     return a + 5
   }
 }
@@ -194,7 +194,7 @@ class Foo {
 exports[`collapsed option 1`] = `
 "
 // sitrep
-function fn(a) {          
+function fn(a) {
   a = a.map(x => x)
   return a
 }
@@ -218,7 +218,7 @@ function fn(a) {
 exports[`custom label 1`] = `
 "
 // 🔬
-function fn(a) {          
+function fn(a) {
   a = a.map(x => x)
   return a
 }
@@ -303,7 +303,7 @@ myFn(
     if (err) {
       return err
     }
-    
+
     vars = vars.map(x => x)
     return vars
   }
@@ -397,7 +397,7 @@ exports[`no function parent 1`] = `
 // sitrep
 if (a) {
   let a = 2
-  
+
   let b = a + 5
 }
 
@@ -480,6 +480,41 @@ const obj = {
 "
 `;
 
+exports[`optional log prefix 1`] = `
+"
+// sitrep prefix
+function bar () {
+  var a = 'foo'
+  const b = 'bar'
+  let c = [a, b].map(x => x)
+  let d = a
+  return c.join('-')
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// sitrep prefix
+function bar() {
+  console.groupCollapsed('(prefix) bar');
+
+  var a = 'foo';
+  console.log('a: ', a);
+  const b = 'bar';
+  console.log('b: ', b);
+  let c = [a, b].map(x => x);
+  console.log('c: ', c);
+  let d = a;
+  console.log('d: ', d);
+
+  var _returnValue = c.join('-');
+
+  console.log('Return Value:', _returnValue);
+  console.groupEnd('(prefix) bar');
+  return _returnValue;
+}
+"
+`;
+
 exports[`should not add console logs 1`] = `
 "
 // sitrep
@@ -517,10 +552,10 @@ class Boom {
 
   fire() {
     let a = 2
-    
+
     return a + 5
   }
-  
+
   handleClick = (e) => e.preventDefault()
 }
 
