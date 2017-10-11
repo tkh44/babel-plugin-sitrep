@@ -50,6 +50,12 @@ class Boom {
   }
 }
 
+// sitrep prefix
+function bar () {
+  var a = 'foo'
+  return a
+}
+
 ```
 
 `↓ ↓ ↓ ↓ ↓ ↓`
@@ -59,39 +65,52 @@ class Boom {
 ```javascript
 // sitrep
 function bar () {
+  console.groupCollapsed('bar');
+
   var a = 'foo';
-  console.log('a', a);
+  console.log('a: ', a);
   const b = 'bar';
-  console.log('b', b);
+  console.log('b: ', b);
   let c = [a, b].map(x => x);
-  console.log('c', c);
+  console.log('c: ', c);
+
   var _returnValue = c.join('-');
+
   console.log('Return Value:', _returnValue);
+  console.groupEnd('bar');
   return _returnValue;
 }
 
 // sitrep
 var cb = function (x) {
+  console.groupCollapsed('cb');
+
   var _returnValue3 = x.charAt(0);
 
   console.log('Return Value:', _returnValue3);
+  console.groupEnd('cb');
   return _returnValue3;
 };
 
 // sitrep
 var cb = function (x) {
+  console.groupCollapsed('cb');
+
   x = x + 2;
-  console.log('x', x);
+  console.log('x: ', x);
   x.charAt(0);
   var _returnValue4 = x;
   console.log('Return Value:', _returnValue4);
+  console.groupEnd('cb');
   return _returnValue4;
 };
 
 // sitrep
 var a = function () {
+  console.groupCollapsed('a');
   var _returnValue5 = 'foo';
   console.log('Return Value:', _returnValue5);
+  console.groupEnd('a');
 
   return _returnValue5;
 };
@@ -99,12 +118,15 @@ var a = function () {
 const obj = {
   // sitrep
   fn() {
+    console.groupCollapsed('fn');
+
     let a = 5;
-    console.log('a', a);
+    console.log('a: ', a);
 
     var _returnValue6 = a + 5;
 
     console.log('Return Value:', _returnValue6);
+    console.groupEnd('fn');
     return _returnValue6;
   }
 };
@@ -112,15 +134,31 @@ const obj = {
 class Boom {
   // sitrep
   fire() {
-    let a = 2;
+    console.groupCollapsed('fire');
 
-    console.log('a', a);
+    let a = 2;
+    console.log('a: ', a);
 
     var _returnValue7 = a + 5;
 
     console.log('Return Value:', _returnValue7);
+    console.groupEnd('fire');
     return _returnValue7;
   }
+}
+
+// sitrep prefix
+function bar () {
+  console.groupCollapsed('(prefix) bar');
+
+  var a = 'foo';
+  console.log('a: ', a);
+
+  var _returnValue8 = c.join('-');
+
+  console.log('Return Value:', _returnValue8);
+  console.groupEnd('(prefix) bar');
+  return _returnValue8;
 }
 ```
 
@@ -174,7 +212,7 @@ If we set `label` to `"log-all-the-things"`
 **In**
 ```javascript
 // log-all-the-things
-function fn(a) {          
+function fn(a) {
   a = a.map(x => x)
   return a
 }
