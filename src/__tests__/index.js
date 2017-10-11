@@ -103,7 +103,7 @@ pluginTester({
           // sitrep
           fire() {
             let a = 2
-            
+
             return a + 5
           }
         }
@@ -115,7 +115,7 @@ pluginTester({
         // sitrep
         if (a) {
           let a = 2
-          
+
           let b = a + 5
         }
       `
@@ -138,7 +138,7 @@ pluginTester({
             if (err) {
               return err
             }
-            
+
             vars = vars.map(x => x)
             return vars
           }
@@ -149,7 +149,7 @@ pluginTester({
       title: 'collapsed option',
       code: `
         // sitrep
-        function fn(a) {          
+        function fn(a) {
           a = a.map(x => x)
           return a
         }
@@ -162,7 +162,7 @@ pluginTester({
       title: 'custom label',
       code: `
         // 🔬
-        function fn(a) {          
+        function fn(a) {
           a = a.map(x => x)
           return a
         }
@@ -214,46 +214,59 @@ pluginTester({
       code: `
         // sitrep
         const shouldNotLog = 'bar';
-        
+
         function bar () {
           var a = 'foo'
           const b = 'bar'
           let c = [a, b].map(x => x)
           return c.join('-')
         }
-        
+
         var cb = x => x.charAt(0)
-        
+
         var cb = x => {
           x = x + 2
           x.charAt(0)
           return x
         }
-        
+
         var a = function () {
           return 'foo'
         }
-        
+
         const obj = {
           fn() {
             let a = 5
             return a + 5
           }
         }
-        
+
         class Boom {
           // sitrep
           shouldNotLog = 'bar';
-        
+
           fire() {
             let a = 2
-            
+
             return a + 5
           }
-          
+
           handleClick = (e) => e.preventDefault()
         }
       `
+    },
+    {
+      title: 'optional log prefix',
+      code: `
+      // sitrep prefix
+      function bar () {
+        var a = 'foo'
+        const b = 'bar'
+        let c = [a, b].map(x => x)
+        let d = a
+        return c.join('-')
+      }
+    `
     }
   ]
 })

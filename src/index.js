@@ -1,3 +1,5 @@
+const defaultLabel = 'sitrep'
+
 module.exports = function (babel) {
   const { types: t } = babel
   const logCallee = t.memberExpression(
@@ -17,8 +19,18 @@ module.exports = function (babel) {
     return (node && node.leadingComments) || []
   }
 
-  function hasSitrepComments (comments, label = 'sitrep') {
-    return comments.some(c => c.value.trim() === label)
+  function hasSitrepComments (comments, label = defaultLabel) {
+    return comments.some(c => c.value.trim().indexOf(label) === 0)
+  }
+
+  function getSitrepCommentPrefix (comments, label = defaultLabel) {
+    for (let i = 0; i < comments.length; i += 1) {
+      const comment = comments[i].value.trim()
+      if (comment.indexOf(label) === 0 && comment.length > label.length) {
+        return comment.substr(label.length).trim()
+      }
+    }
+    return undefined
   }
 
   function createLogStatement (thing) {
@@ -56,8 +68,9 @@ module.exports = function (babel) {
     return `function: ${path.getSource().split('\n')[0]}`
   }
 
-  function functionVisitor (functionPath, state) {
+  function functionVisitor (functionPath, state, prefix) {
     let name = getName(functionPath)
+    if (prefix) name = `(${prefix}) ${name}`
     functionPath
       .get('body')
       .unshiftContainer(
@@ -175,10 +188,12 @@ module.exports = function (babel) {
       Class (path, state) {
         path.traverse({
           ClassProperty (path) {
-            if (hasSitrepComments(getComments(path.node), state.opts.label)) {
+            const comments = getComments(path.node)
+            if (hasSitrepComments(comments, state.opts.label)) {
+              const prefix = getSitrepCommentPrefix(comments, state.opts.label)
               path.traverse({
                 Function (path) {
-                  functionVisitor(path, state)
+                  functionVisitor(path, state, prefix)
                 }
               })
             }
@@ -186,24 +201,28 @@ module.exports = function (babel) {
         })
       },
       Function (path, state) {
-        if (hasSitrepComments(getComments(path.node), state.opts.label)) {
+        const comments = getComments(path.node)
+        if (hasSitrepComments(comments, state.opts.label)) {
+          const prefix = getSitrepCommentPrefix(comments, state.opts.label)
           if (path.isArrowFunctionExpression()) {
             path.arrowFunctionToShadowed()
           }
-          functionVisitor(path, state)
+          functionVisitor(path, state, prefix)
         }
       },
       VariableDeclarator (path, state) {
+        const comments = getComments(path.parentPath.node)
         if (
-          hasSitrepComments(getComments(path.parentPath.node), state.opts.label)
+          hasSitrepComments(comments, state.opts.label)
         ) {
+          const prefix = getSitrepCommentPrefix(comments, state.opts.label)
           if (t.isArrowFunctionExpression(path.node.init)) {
             path.get('init').arrowFunctionToShadowed()
           }
           if (t.isFunction(path.node.init)) {
             path.traverse({
               Function (path) {
-                functionVisitor(path, state)
+                functionVisitor(path, state, prefix)
               }
             })
           }
