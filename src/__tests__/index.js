@@ -63,6 +63,19 @@ pluginTester({
       `
     },
     {
+      title: 'object properties: Assigning the rest of an object to a variable',
+      code: `
+        const obj = {
+          // sitrep
+          fn() {
+            const { a, b, c = 'foo', ...rest } = x;
+            const d = a + b + c;
+            return { d, rest };
+          }
+        }
+      `
+    },
+    {
       title: 'object properties with let',
       code: `
         const obj = {
@@ -82,6 +95,27 @@ pluginTester({
         function fn() {
           const [a, b = 'foo', c, d] = x.split("_");
           return a + b + c + d;
+        }
+      `
+    },
+    {
+      title: 'array properties: Ignoring some returned values',
+      code: `
+        // sitrep
+        function fn() {
+          const [, a, b, c, d] = x.split("_");
+          return a + b + c + d;
+        }
+      `
+    },
+    {
+      title: 'array properties: Assigning the rest of an array to a variable',
+      code: `
+        // sitrep
+        function fn() {
+          const [, a, b, ...rest] = x.split("_");
+          const c = a + b;
+          return { sum: c, rest };
         }
       `
     },
